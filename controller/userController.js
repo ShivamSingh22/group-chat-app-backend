@@ -1,7 +1,7 @@
 const express = require("express");
 const User = require("../models/userModel");
 const bcrypt = require('bcrypt');
-
+const saltRounds =10;
 exports.postSignup = async (req, res, next) => {
     const { username } = req.body;
     const { email } = req.body;
@@ -12,7 +12,7 @@ exports.postSignup = async (req, res, next) => {
       const existingUser = await User.findOne({ where: { email } });
   
       if (existingUser) {
-        return res.status(403).json({ message: "ERROR: USER ALREADY EXISTS" });
+        return res.status(403).json({ message: "USER ALREADY EXISTS, PLEASE LOGIN" });
       } else {
           bcrypt.hash(password, saltRounds, async function(err, hash) {
               if(err){
