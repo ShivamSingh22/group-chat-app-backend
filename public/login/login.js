@@ -13,7 +13,7 @@ function handleFormSubmit(event){
     axios.post('http://localhost:3000/user/login',obj)
     .then((res)=>{
         localStorage.setItem('token', res.data.token);
-        // window.location.href = "../expense/expense.html"
+        window.location.href = "../chat/chat.html";
         messageLabel.innerHTML = res.data.message;
         event.target.reset();
     })
