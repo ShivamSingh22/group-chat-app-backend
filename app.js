@@ -7,10 +7,11 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const userRoutes = require("./routes/userRoute");
-
+const chatRoutes = require("./routes/chatRoute");
 const sequelize = require("./util/database");
 
 const User = require("./models/userModel");
+const Chats = require("./models/chatModel")
 
 const app = express();
 app.use(
@@ -21,6 +22,10 @@ app.use(
 app.use(bodyParser.json({ extended: false }));
 
 app.use("/user", userRoutes);
+app.use("/chat", chatRoutes);
+
+User.hasMany(Chats);
+Chats.belongsTo(User);
 
 sequelize
   .sync()

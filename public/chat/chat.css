@@ -22,13 +22,12 @@ h1 {
 
 /* Chat container that holds the chat messages */
 .chat-container {
-    flex-grow: 1; /* Fills available space */
-    background-color: #b7e9f5;
-    padding: 20px;
+    flex: 1; /* Fills available space */
     overflow-y: auto; /* Allows scrolling for overflowing chat messages */
+    padding: 20px;
+    background-color: #b7e9f5;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
 }
 
 /* Styling for each message (li element) */
@@ -88,4 +87,10 @@ h1 {
 
 .send-button:hover {
     background-color: #45a049;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }

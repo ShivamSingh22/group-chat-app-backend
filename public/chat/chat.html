@@ -8,17 +8,16 @@
 </head>
 <body>
     <h1>CHAT APP</h1>
-    <div class="chat-container">
-        <li>
-            Hi I am here Hi I am here Hi I am here Hi I am hereHi I am here Hi I am here Hi I am here Hi I am hereHi I am here Hi I am here Hi I am here Hi I a I am hereHi I am here Hi I am here Hi I am here Hi I am hereHi I am here Hi I am here Hi I am here Hi I am here
-        </li>
-     
-     
-    </div>
-    <div class="chat-send">
-        <input type="text" class="chat-input" placeholder="Enter message . . ." required>
-        <button class="send-button">Send</button>
-    </div>
+    <form onsubmit="handleFormSubmit(event)">
+        <div class="chat-container">
+            
+        </div>
+        <div class="chat-send">
+            <input type="text" class="chat-input" placeholder="Enter message . . ." required>
+            <button type="submit" class="send-button">Send</button>
+        </div>
+    </form>
     <script src="chat.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </body>
 </html>
