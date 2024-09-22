@@ -1,17 +1,21 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../util/database');
 
-const Chat = sequelize.define('chat', {
+const Group = sequelize.define('group', {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
     primaryKey: true
   },
-  message: {
+  name: {
     type: Sequelize.STRING,
     allowNull: false
   },
+  createdBy: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  }
 });
 
-module.exports = Chat;
+module.exports = Group;

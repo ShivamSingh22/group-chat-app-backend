@@ -1,15 +1,23 @@
-const Chats = require('../models/chatModel');
+const Chat = require('../models/chatModel');
 const User = require('../models/userModel');
+const GroupMember = require('../models/groupMemberModel');
 const Op = require('sequelize').Op;
 
 exports.postChat = async (req, res) => {
     try {
-        const { message } = req.body;
-        console.log(message);
-        const chat = await req.user.createChat({
-            message: message
-        })
-        res.status(200).json({ message: "Message received" });
+        const { message, groupId } = req.body;
+        const isMember = await GroupMember.findOne({
+            where: { groupId, userId: req.user.id }
+        });
+        if (!isMember) {
+            return res.status(403).json({ message: "You are not a member of this group" });
+        }
+        const chat = await Chat.create({
+            message,
+            userId: req.user.id,
+            groupId
+        });
+        res.status(200).json({ message: "Message sent" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal server error" });
@@ -18,17 +26,24 @@ exports.postChat = async (req, res) => {
 
 exports.getChat = async (req, res) => {
     try {
-        const lastId = parseInt(req.query.lastId) || 0;
-        
-        const chats = await Chats.findAll({
+        const { groupId, lastId } = req.query;
+        const isMember = await GroupMember.findOne({
+            where: { groupId, userId: req.user.id }
+        });
+        if (!isMember) {
+            return res.status(403).json({ message: "You are not a member of this group" });
+        }
+        const chats = await Chat.findAll({
             where: {
-                id: { [Op.gt]: lastId }
+                groupId,
+                id: { [Op.gt]: lastId || 0 }
             },
             include: [{
                 model: User,
                 attributes: ['username']
             }],
-            order: [['id', 'ASC']]
+            order: [['id', 'ASC']],
+            limit: 20 // Limit the number of messages to keep the API lightweight
         });
 
         const formattedChats = chats.map(chat => ({

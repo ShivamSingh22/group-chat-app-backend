@@ -8,18 +8,24 @@
 </head>
 <body>
     <h1>CHAT APP</h1>
-    <form onsubmit="handleFormSubmit(event)">
-        <div class="chat-container">
-            <ul>
-            
-            </ul>
+    <div class="app-container">
+        <div class="sidebar">
+            <button id="createGroupBtn">Create Group</button>
+            <ul id="groupList"></ul>
         </div>
-        <div class="chat-send">
-            <input type="text" class="chat-input" placeholder="Enter message . . ." required>
-            <button type="submit" class="send-button">Send</button>
+        <div class="chat-area">
+            <div class="chat-container">
+                <ul id="messageList"></ul>
+            </div>
+            <form id="chatForm" onsubmit="handleFormSubmit(event)">
+                <div class="chat-send">
+                    <input type="text" class="chat-input" placeholder="Enter message . . ." required>
+                    <button type="submit" class="send-button">Send</button>
+                </div>
+            </form>
         </div>
-    </form>
-    <script src="chat.js"></script>
+    </div>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="chat.js"></script>
 </body>
 </html>
