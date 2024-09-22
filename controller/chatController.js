@@ -1,5 +1,6 @@
 const Chats = require('../models/chatModel');
 const User = require('../models/userModel');
+const Op = require('sequelize').Op;
 
 exports.postChat = async (req, res) => {
     try {
@@ -17,11 +18,17 @@ exports.postChat = async (req, res) => {
 
 exports.getChat = async (req, res) => {
     try {
+        const lastId = parseInt(req.query.lastId) || 0;
+        
         const chats = await Chats.findAll({
+            where: {
+                id: { [Op.gt]: lastId }
+            },
             include: [{
                 model: User,
                 attributes: ['username']
             }],
+            order: [['id', 'ASC']]
         });
 
         const formattedChats = chats.map(chat => ({
