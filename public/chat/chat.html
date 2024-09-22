@@ -12,17 +12,25 @@
         <div class="sidebar">
             <button id="createGroupBtn">Create Group</button>
             <ul id="groupList"></ul>
+            <div class="add-to-group">
+                <h3>Add to Group</h3>
+                <ul id="nonMemberList"></ul>
+            </div>
         </div>
         <div class="chat-area">
             <div class="chat-container">
                 <ul id="messageList"></ul>
             </div>
-            <form id="chatForm" onsubmit="handleFormSubmit(event)">
+            <form id="chatForm">
                 <div class="chat-send">
                     <input type="text" class="chat-input" placeholder="Enter message . . ." required>
                     <button type="submit" class="send-button">Send</button>
                 </div>
             </form>
+        </div>
+        <div class="group-members">
+            <h3>Group Members</h3>
+            <ul id="memberList"></ul>
         </div>
     </div>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

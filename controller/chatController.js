@@ -17,7 +17,12 @@ exports.postChat = async (req, res) => {
             userId: req.user.id,
             groupId
         });
-        res.status(200).json({ message: "Message sent" });
+        res.status(200).json({ 
+            message: "Message sent", 
+            chatId: chat.id,
+            username: req.user.username,
+            createdAt: chat.createdAt
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal server error" });
@@ -43,7 +48,7 @@ exports.getChat = async (req, res) => {
                 attributes: ['username']
             }],
             order: [['id', 'ASC']],
-            limit: 20 // Limit the number of messages to keep the API lightweight
+            limit: 100
         });
 
         const formattedChats = chats.map(chat => ({

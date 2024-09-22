@@ -4,6 +4,8 @@ const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+
+
 require("dotenv").config();
 
 const userRoutes = require("./routes/userRoute");
@@ -19,7 +21,8 @@ const GroupMember = require("./models/groupMemberModel");
 const app = express();
 app.use(
   cors({
-    origin: "http://127.0.0.1:3000",
+    origin: ["http://127.0.0.1:3000", "http://localhost:3000", "null"],
+    credentials: true,
   })
 );
 app.use(bodyParser.json({ extended: false }));

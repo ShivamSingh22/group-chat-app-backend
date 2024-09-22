@@ -53,20 +53,35 @@ h1 {
     background-color: #128C7E;
 }
 
-#groupList {
+#groupList, #nonMemberList, #memberList {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
 
-#groupList li {
+#groupList li, #nonMemberList li, #memberList li {
     padding: 15px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-#groupList li:hover {
+#groupList li:hover, #nonMemberList li:hover {
     background-color: #f0f2f5;
+}
+
+#groupList li.selected {
+    background-color: #DCF8C6;
+    font-weight: bold;
+}
+
+.add-to-group {
+    margin-top: 20px;
+    padding: 0 15px;
+}
+
+.add-to-group h3 {
+    font-size: 18px;
+    color: #128C7E;
 }
 
 /* Chat area styling */
@@ -91,6 +106,9 @@ h1 {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #messageList li {
@@ -98,22 +116,9 @@ h1 {
     margin-bottom: 15px;
     padding: 10px 15px;
     border-radius: 15px;
-    position: relative;
-    clear: both;
-    word-wrap: break-word;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-#messageList li:nth-child(odd) {
-    background-color: #DCF8C6;
-    float: right;
-    border-bottom-right-radius: 0;
-}
-
-#messageList li:nth-child(even) {
     background-color: #FFFFFF;
-    float: left;
-    border-bottom-left-radius: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    word-wrap: break-word;
 }
 
 /* Input and send button area */
@@ -127,11 +132,15 @@ h1 {
 /* Input field for typing messages */
 .chat-input {
     flex: 1;
-    padding: 10px;
+    padding: 12px 15px; /* Increased padding */
     border: none;
-    border-radius: 20px;
+    border-radius: 25px; /* Increased border-radius */
     font-size: 16px;
     background-color: white;
+    min-height: 20px; /* Added min-height */
+    max-height: 100px; /* Added max-height */
+    resize: vertical; /* Allow vertical resizing */
+    overflow-y: auto; /* Add scrollbar when content exceeds max-height */
 }
 
 /* Send button styling */
@@ -139,8 +148,8 @@ h1 {
     background-color: #128C7E;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
+    padding: 12px 25px; /* Increased padding */
+    border-radius: 25px; /* Increased border-radius */
     margin-left: 10px;
     cursor: pointer;
     font-size: 16px;
@@ -149,4 +158,39 @@ h1 {
 
 .send-button:hover {
     background-color: #075E54;
+}
+
+.group-members {
+    width: 250px;
+    background-color: #ffffff;
+    border-left: 1px solid #e0e0e0;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.group-members h3 {
+    font-size: 18px;
+    color: #128C7E;
+    margin-top: 0;
+}
+
+#nonMemberList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#nonMemberList li button {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+#nonMemberList li button:hover {
+    background-color: #128C7E;
 }
