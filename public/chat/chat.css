@@ -84,6 +84,62 @@ h1 {
     color: #128C7E;
 }
 
+#userSearchInput {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#searchResults {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+#searchResults li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+#searchResults li .user-info {
+    flex: 1;
+    min-width: 0; /* Allows text to wrap */
+    margin-right: 10px;
+}
+
+#searchResults li .user-info .username {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+#searchResults li .user-info .email {
+    font-size: 0.9em;
+    color: #666;
+    word-break: break-all; /* Allows long emails to wrap */
+}
+
+#searchResults li button {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap; /* Prevents button text from wrapping */
+}
+
+#searchResults li button:hover {
+    background-color: #128C7E;
+}
+
 /* Chat area styling */
 .chat-area {
     flex: 1;

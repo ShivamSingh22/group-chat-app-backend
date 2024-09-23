@@ -171,32 +171,45 @@ function displayGroupMembers(members, isUserAdmin) {
     }
 }
 
-// New function to fetch and display non-group members
-function fetchNonGroupMembers(groupId) {
+function searchUsers(query) {
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:3000/group/${groupId}/non-members`, {
+    axios.get(`http://localhost:3000/group/search-users?query=${query}&groupId=${currentGroupId}`, {
         headers: { 'Authorization': token }
     }).then((res) => {
-        displayNonGroupMembers(res.data.nonMembers, groupId);
+        displaySearchResults(res.data.users);
     }).catch(console.error);
 }
 
-// New function to display non-group members with add button
-function displayNonGroupMembers(nonMembers, groupId) {
-    const nonMemberList = document.getElementById('nonMemberList');
-    nonMemberList.innerHTML = '';
-    nonMembers.forEach(member => {
+function displaySearchResults(users) {
+    const searchResultsList = document.getElementById('searchResults');
+    searchResultsList.innerHTML = '';
+    users.forEach(user => {
         const li = document.createElement('li');
-        li.textContent = member.username;
+        
+        const userInfo = document.createElement('div');
+        userInfo.className = 'user-info';
+        
+        const username = document.createElement('div');
+        username.className = 'username';
+        username.textContent = user.username;
+        userInfo.appendChild(username);
+        
+        const email = document.createElement('div');
+        email.className = 'email';
+        email.textContent = user.email;
+        userInfo.appendChild(email);
+        
+        li.appendChild(userInfo);
+        
         const addButton = document.createElement('button');
         addButton.textContent = 'Add';
-        addButton.onclick = () => addMemberToGroup(groupId, member.id);
+        addButton.onclick = () => addMemberToGroup(currentGroupId, user.id);
+        
         li.appendChild(addButton);
-        nonMemberList.appendChild(li);
+        searchResultsList.appendChild(li);
     });
 }
 
-// New function to add a member to the group
 function addMemberToGroup(groupId, userId) {
     const token = localStorage.getItem('token');
     axios.post('http://localhost:3000/group/add-member', 
@@ -205,7 +218,8 @@ function addMemberToGroup(groupId, userId) {
     ).then(() => {
         // Refresh the member lists
         fetchGroupMembers(groupId);
-        fetchNonGroupMembers(groupId);
+        document.getElementById('userSearchInput').value = '';
+        document.getElementById('searchResults').innerHTML = '';
     }).catch(console.error);
 }
 
@@ -285,6 +299,15 @@ window.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chatForm');
     chatForm.removeEventListener('submit', handleFormSubmit);
     chatForm.addEventListener('submit', handleFormSubmit);
+
+    const userSearchInput = document.getElementById('userSearchInput');
+    userSearchInput.addEventListener('input', (e) => {
+        if (e.target.value.length >= 3) {
+            searchUsers(e.target.value);
+        } else {
+            document.getElementById('searchResults').innerHTML = '';
+        }
+    });
 });
 
 setInterval(handleGetChat, 30000); // Poll for new messages every 30 seconds

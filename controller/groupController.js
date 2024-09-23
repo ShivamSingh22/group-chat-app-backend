@@ -258,3 +258,37 @@ exports.addUserToGroup = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+exports.searchUsers = async (req, res) => {
+    try {
+        const { query, groupId } = req.query;
+        
+        // Check if the requesting user is an admin of the group
+        const isAdmin = await GroupAdmin.findOne({
+            where: { groupId, userId: req.user.id }
+        });
+        
+        if (!isAdmin) {
+            return res.status(403).json({ message: "Only admins can search and add users to the group" });
+        }
+
+        const users = await User.findAll({
+            where: {
+                [Op.or]: [
+                    { username: { [Op.like]: `%${query}%` } },
+                    { email: { [Op.like]: `%${query}%` } },
+                    { contact: { [Op.like]: `%${query}%` } }
+                ],
+                id: {
+                    [Op.notIn]: sequelize.literal(`(SELECT userId FROM groupMembers WHERE groupId = ${groupId})`)
+                }
+            },
+            attributes: ['id', 'username', 'email']
+        });
+
+        res.status(200).json({ users });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
