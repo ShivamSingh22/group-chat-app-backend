@@ -130,19 +130,45 @@ function fetchGroupMembers(groupId) {
     axios.get(`http://localhost:3000/group/${groupId}/members`, {
         headers: { 'Authorization': token }
     }).then((res) => {
-        displayGroupMembers(res.data.members);
+        displayGroupMembers(res.data.members, res.data.isUserAdmin);
     }).catch(console.error);
 }
 
 // New function to display group members
-function displayGroupMembers(members) {
+function displayGroupMembers(members, isUserAdmin) {
     const memberList = document.getElementById('memberList');
     memberList.innerHTML = '';
     members.forEach(member => {
         const li = document.createElement('li');
         li.textContent = member.username;
+        
+        if (member.isAdmin) {
+            const adminLabel = document.createElement('span');
+            adminLabel.textContent = ' (Admin)';
+            adminLabel.classList.add('admin-label');
+            li.appendChild(adminLabel);
+        }
+        
+        if (isUserAdmin && !member.isAdmin) {
+            const makeAdminBtn = document.createElement('button');
+            makeAdminBtn.textContent = 'Make Admin';
+            makeAdminBtn.onclick = () => makeAdmin(member.id);
+            li.appendChild(makeAdminBtn);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = 'Remove';
+            removeBtn.onclick = () => removeUser(member.id);
+            li.appendChild(removeBtn);
+        }
+        
         memberList.appendChild(li);
     });
+
+    // Show/hide the "Add to Group" section based on admin status
+    const addToGroupSection = document.querySelector('.add-to-group');
+    if (addToGroupSection) {
+        addToGroupSection.style.display = isUserAdmin ? 'block' : 'none';
+    }
 }
 
 // New function to fetch and display non-group members
@@ -195,19 +221,37 @@ function createGroup() {
     }
 }
 
-function inviteToGroup() {
+function makeAdmin(userId) {
     if (!currentGroupId) {
         alert("Please select a group first");
         return;
     }
-    const userEmail = prompt("Enter user email to invite:");
-    if (userEmail) {
+    const token = localStorage.getItem('token');
+    axios.post('http://localhost:3000/group/make-admin', { groupId: currentGroupId, userId }, {
+        headers: { 'Authorization': token }
+    }).then(() => {
+        alert("User is now an admin of the group");
+        fetchGroupMembers(currentGroupId);
+    }).catch(error => {
+        alert(error.response.data.message || "Error making user admin");
+    });
+}
+
+function removeUser(userId) {
+    if (!currentGroupId) {
+        alert("Please select a group first");
+        return;
+    }
+    if (confirm("Are you sure you want to remove this user from the group?")) {
         const token = localStorage.getItem('token');
-        axios.post('http://localhost:3000/group/invite', { groupId: currentGroupId, userEmail }, {
+        axios.post('http://localhost:3000/group/remove-user', { groupId: currentGroupId, userId }, {
             headers: { 'Authorization': token }
         }).then(() => {
-            alert("User invited successfully");
-        }).catch(console.error);
+            alert("User removed from the group");
+            fetchGroupMembers(currentGroupId);
+        }).catch(error => {
+            alert(error.response.data.message || "Error removing user");
+        });
     }
 }
 
@@ -216,7 +260,6 @@ function getUserGroups() {
     axios.get('http://localhost:3000/group/user-groups', {
         headers: { 'Authorization': token }
     }).then((res) => {
-        console.log('User groups response:', res.data); // Add this line for debugging
         displayGroups(res.data.groups);
     }).catch((err) => {
         console.error('Error fetching user groups:', err);
@@ -233,7 +276,6 @@ function displayGroups(groups) {
         li.onclick = () => switchGroup(group.id);
         groupList.appendChild(li);
     });
-    console.log('Groups displayed:', groups); // Add this line for debugging
 }
 
 window.addEventListener('DOMContentLoaded', () => {

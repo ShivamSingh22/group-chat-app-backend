@@ -17,6 +17,7 @@ const User = require("./models/userModel");
 const Chats = require("./models/chatModel");
 const Group = require("./models/groupModel");
 const GroupMember = require("./models/groupMemberModel");
+const GroupAdmin = require("./models/groupAdminModel");
 
 const app = express();
 app.use(
@@ -47,13 +48,14 @@ Chats.belongsTo(Group);
 User.belongsToMany(Group, { through: GroupMember });
 Group.belongsToMany(User, { through: GroupMember });
 
+Group.belongsToMany(User, { through: GroupAdmin, as: 'Admins' });
+User.belongsToMany(Group, { through: GroupAdmin, as: 'AdminOf' });
+
 sequelize
-  .sync()
-  .then(() => {
-    app.listen(3000, () => {
-      console.log('Server is running on port 3000');
-    });
+  .sync() 
+  .then(result => {
+    app.listen(3000);
   })
-  .catch((err) => {
-    console.error('Unable to connect to the database:', err);
+  .catch(err => {
+    console.log(err);
   });
