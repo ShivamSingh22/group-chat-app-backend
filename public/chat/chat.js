@@ -31,7 +31,7 @@ function loadMessagesFromLocalStorage(groupId) {
 
 function loadInitialMessages(groupId) {
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:3000/chat/msg?groupId=${groupId}&lastId=${lastMessageIds[groupId]}`, {
+    axios.get(`http://43.205.209.88:3000/chat/msg?groupId=${groupId}&lastId=${lastMessageIds[groupId]}`, {
         headers: { 'Authorization': token }
     }).then((res) => {
         const chats = res.data.chats;
@@ -79,7 +79,7 @@ function handleFormSubmit(event) {
         groupId: currentGroupId
     }
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/chat/msg', obj, {
+    axios.post('http://43.205.209.88:3000/chat/msg', obj, {
         headers: { 'Authorization': token }
     }).then((res) => {
         console.log(res);
@@ -106,7 +106,7 @@ function handleFormSubmit(event) {
 function handleGetChat() {
     if (!currentGroupId) return;
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:3000/chat/msg?groupId=${currentGroupId}&lastId=${lastMessageIds[currentGroupId]}`, {
+    axios.get(`http://43.205.209.88:3000/chat/msg?groupId=${currentGroupId}&lastId=${lastMessageIds[currentGroupId]}`, {
         headers: { 'Authorization': token }
     }).then((res) => {
         const newChats = res.data.chats;
@@ -127,7 +127,7 @@ function handleGetChat() {
 
 function fetchGroupMembers(groupId) {
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:3000/group/${groupId}/members`, {
+    axios.get(`http://43.205.209.88:3000/group/${groupId}/members`, {
         headers: { 'Authorization': token }
     }).then((res) => {
         displayGroupMembers(res.data.members, res.data.isUserAdmin);
@@ -173,7 +173,7 @@ function displayGroupMembers(members, isUserAdmin) {
 
 function searchUsers(query) {
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:3000/group/search-users?query=${query}&groupId=${currentGroupId}`, {
+    axios.get(`http://43.205.209.88:3000/group/search-users?query=${query}&groupId=${currentGroupId}`, {
         headers: { 'Authorization': token }
     }).then((res) => {
         displaySearchResults(res.data.users);
@@ -212,7 +212,7 @@ function displaySearchResults(users) {
 
 function addMemberToGroup(groupId, userId) {
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/group/add-member', 
+    axios.post('http://43.205.209.88:3000/group/add-member', 
         { groupId, userId },
         { headers: { 'Authorization': token } }
     ).then(() => {
@@ -227,7 +227,7 @@ function createGroup() {
     const groupName = prompt("Enter group name:");
     if (groupName) {
         const token = localStorage.getItem('token');
-        axios.post('http://localhost:3000/group/create', { name: groupName }, {
+        axios.post('http://43.205.209.88:3000/group/create', { name: groupName }, {
             headers: { 'Authorization': token }
         }).then(() => {
             getUserGroups();
@@ -241,7 +241,7 @@ function makeAdmin(userId) {
         return;
     }
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/group/make-admin', { groupId: currentGroupId, userId }, {
+    axios.post('http://43.205.209.88:3000/group/make-admin', { groupId: currentGroupId, userId }, {
         headers: { 'Authorization': token }
     }).then(() => {
         alert("User is now an admin of the group");
@@ -258,7 +258,7 @@ function removeUser(userId) {
     }
     if (confirm("Are you sure you want to remove this user from the group?")) {
         const token = localStorage.getItem('token');
-        axios.post('http://localhost:3000/group/remove-user', { groupId: currentGroupId, userId }, {
+        axios.post('http://43.205.209.88:3000/group/remove-user', { groupId: currentGroupId, userId }, {
             headers: { 'Authorization': token }
         }).then(() => {
             alert("User removed from the group");
@@ -271,7 +271,7 @@ function removeUser(userId) {
 
 function getUserGroups() {
     const token = localStorage.getItem('token');
-    axios.get('http://localhost:3000/group/user-groups', {
+    axios.get('http://43.205.209.88:3000/group/user-groups', {
         headers: { 'Authorization': token }
     }).then((res) => {
         displayGroups(res.data.groups);

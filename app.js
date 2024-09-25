@@ -32,6 +32,11 @@ app.use("/user", userRoutes);
 app.use("/chat", chatRoutes);
 app.use("/group", groupRoutes);
 
+app.use((req,res)=> {
+  console.log(req.url);
+  res.sendFile(path.join(__dirname, `public/${req.url}`));
+})
+
 // Associations
 User.hasMany(Chats);
 Chats.belongsTo(User);
