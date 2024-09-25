@@ -15,7 +15,7 @@ function handleFormSubmit(event) {
         contact : contact
     };
 
-    axios.post('http://43.205.209.88:3000/user/signup', obj)
+    axios.post('http://13.235.112.144/user/signup', obj)
         .then((res) => {
             messageTxt.innerHTML = res.data.message;
             event.target.reset();

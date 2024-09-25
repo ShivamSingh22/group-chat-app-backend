@@ -10,7 +10,7 @@ function handleFormSubmit(event){
         password:password
     }
 
-    axios.post('http://43.205.209.88:3000/user/login', obj)
+    axios.post('http://13.235.112.144/user/login', obj)
     .then((res)=>{
         localStorage.setItem('token', res.data.token);
         window.location.href = "../chat/chat.html";

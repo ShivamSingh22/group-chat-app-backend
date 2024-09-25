@@ -22,7 +22,7 @@ const GroupAdmin = require("./models/groupAdminModel");
 const app = express();
 app.use(
   cors({
-    origin: ["http://127.0.0.1:3000", "http://localhost:3000", "null"],
+    origin: ["http://13.235.112.144","http://127.0.0.1:3000", "http://localhost:3000", "null"],
     credentials: true,
   })
 );
