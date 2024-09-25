@@ -21,7 +21,7 @@ function switchGroup(groupId) {
     // Then fetch any new messages
     loadInitialMessages(groupId);
     fetchGroupMembers(groupId);
-    fetchNonGroupMembers(groupId);
+    // fetchNonGroupMembers(groupId);
 }
 
 function loadMessagesFromLocalStorage(groupId) {
