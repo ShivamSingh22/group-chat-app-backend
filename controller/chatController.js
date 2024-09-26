@@ -35,17 +35,17 @@ exports.postChat = async (req, res) => {
             userId: chat.userId,
             username: req.user.username,
             createdAt: chat.createdAt,
-            fileUrl: chat.fileUrl
+            fileUrl: chat.fileUrl,
+            groupId: chat.groupId
         };
+
         const io = req.app.get('io');
         if (io) {
             io.to(groupId).emit('new message', newMessage);
-        } else {
-            console.warn('Socket.IO instance not available');
         }
 
         res.status(200).json({ 
-            message: "Message sent", 
+            message: "Message sent successfully",
             chatId: chat.id,
             username: req.user.username,
             createdAt: chat.createdAt,
@@ -84,7 +84,8 @@ exports.getChat = async (req, res) => {
             message: chat.message,
             userId: chat.userId,
             username: chat.user ? chat.user.username : 'Unknown User',
-            createdAt: chat.createdAt
+            createdAt: chat.createdAt,
+            fileUrl: chat.fileUrl  // Include fileUrl in the response
         }));
         
         res.status(200).json({ chats: formattedChats });

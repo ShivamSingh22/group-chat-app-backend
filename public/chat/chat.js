@@ -12,6 +12,10 @@ socket.on('new message', (message) => {
     console.log('New message received:', message);
     if (message.groupId === currentGroupId) {
         appendNewChatsToUI([message]);
+        // Update localStorage
+        const storedMessages = JSON.parse(localStorage.getItem(`messages_${currentGroupId}`)) || [];
+        storedMessages.push(message);
+        localStorage.setItem(`messages_${currentGroupId}`, JSON.stringify(storedMessages));
     }
 });
 
@@ -154,7 +158,7 @@ function handleFormSubmit(event) {
         const newMessage = {
             id: res.data.chatId,
             message: message,
-            username: res.data.username,
+            username: res.data.username,  // Use the username from the response
             fileUrl: res.data.fileUrl,
             createdAt: res.data.createdAt
         };
@@ -368,7 +372,11 @@ window.addEventListener('DOMContentLoaded', () => {
     socket.on('new message', (message) => {
         console.log('New message received:', message);
         if (message.groupId === currentGroupId) {
-            handleNewMessage(message);
+            appendNewChatsToUI([message]);
+            // Update localStorage
+            const storedMessages = JSON.parse(localStorage.getItem(`messages_${currentGroupId}`)) || [];
+            storedMessages.push(message);
+            localStorage.setItem(`messages_${currentGroupId}`, JSON.stringify(storedMessages));
         }
     });
 });
