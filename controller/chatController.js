@@ -5,6 +5,7 @@ const {Op} = require('sequelize');
 const { uploadToS3 } = require('../util/s3services');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
+const ArchivedChat = require('../models/ArchivedChat');
 
 exports.postChat = async (req, res) => {
     try {
@@ -66,7 +67,9 @@ exports.getChat = async (req, res) => {
         if (!isMember) {
             return res.status(403).json({ message: "You are not a member of this group" });
         }
-        const chats = await Chat.findAll({
+
+        // Fetch recent chats from Chat table
+        const recentChats = await Chat.findAll({
             where: {
                 groupId,
                 id: { [Op.gt]: lastId || 0 }
@@ -79,13 +82,33 @@ exports.getChat = async (req, res) => {
             limit: 100
         });
 
-        const formattedChats = chats.map(chat => ({
+        // Fetch archived chats if needed
+        let archivedChats = [];
+        if (recentChats.length < 100) {
+            const remainingLimit = 100 - recentChats.length;
+            archivedChats = await ArchivedChat.findAll({
+                where: {
+                    groupId,
+                    id: { [Op.gt]: lastId || 0 }
+                },
+                include: [{
+                    model: User,
+                    attributes: ['username']
+                }],
+                order: [['id', 'ASC']],
+                limit: remainingLimit
+            });
+        }
+
+        // Combine and format chats
+        const allChats = [...recentChats, ...archivedChats];
+        const formattedChats = allChats.map(chat => ({
             id: chat.id,
             message: chat.message,
             userId: chat.userId,
             username: chat.user ? chat.user.username : 'Unknown User',
             createdAt: chat.createdAt,
-            fileUrl: chat.fileUrl  // Include fileUrl in the response
+            fileUrl: chat.fileUrl
         }));
         
         res.status(200).json({ chats: formattedChats });

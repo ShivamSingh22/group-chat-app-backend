@@ -19,6 +19,8 @@ const Group = require("./models/groupModel");
 const GroupMember = require("./models/groupMemberModel");
 const GroupAdmin = require("./models/groupAdminModel");
 
+const { archiveChats } = require('./util/archiveChatCron');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -91,6 +93,9 @@ sequelize
   .catch(err => {
     console.log(err);
   });
+
+// Start the cron job
+archiveChats();
 
 // After creating a new chat message
 // io.to(groupId).emit('new message', {
