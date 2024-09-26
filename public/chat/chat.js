@@ -1,4 +1,3 @@
-
 const socket = io('http://localhost:3000', {
     reconnection: true,
     reconnectionAttempts: 5,
@@ -6,7 +5,14 @@ const socket = io('http://localhost:3000', {
 });
 
 socket.on('connect', () => {
-    console.log('Connected to server');
+    console.log('Connected to socket server');
+});
+
+socket.on('new message', (message) => {
+    console.log('New message received:', message);
+    if (message.groupId === currentGroupId) {
+        appendNewChatsToUI([message]);
+    }
 });
 
 socket.on('connect_error', (error) => {
@@ -44,7 +50,7 @@ function switchGroup(groupId) {
     // Then fetch any new messages
     loadInitialMessages(groupId);
     fetchGroupMembers(groupId);
-    fetchNonGroupMembers(groupId);
+    // fetchNonGroupMembers(groupId);
 }
 
 function loadMessagesFromLocalStorage(groupId) {
@@ -76,11 +82,39 @@ function loadInitialMessages(groupId) {
 function appendNewChatsToUI(newChats) {
     const ul = document.getElementById('messageList');
     newChats.forEach((chat) => {
-        // Check if the message already exists in the UI
         if (!document.querySelector(`#messageList li[data-chat-id="${chat.id}"]`)) {
             const li = document.createElement('li');
-            li.textContent = `${chat.username}: ${chat.message}`;
             li.setAttribute('data-chat-id', chat.id);
+
+            const userSpan = document.createElement('span');
+            userSpan.textContent = `${chat.username}: `;
+            li.appendChild(userSpan);
+
+            if (chat.fileUrl) {
+                const link = document.createElement('a');
+                link.href = chat.fileUrl;
+                link.target = '_blank'; // Open in new tab
+                link.rel = 'noopener noreferrer'; // Security best practice for links opening in new tabs
+
+                if (chat.fileUrl.match(/\.(jpeg|jpg|gif|png)$/)) {
+                    const img = document.createElement('img');
+                    img.src = chat.fileUrl;
+                    img.style.maxWidth = '200px';
+                    img.style.cursor = 'pointer'; // Change cursor to indicate clickable
+                    link.appendChild(img);
+                } else {
+                    link.textContent = 'Download File';
+                }
+
+                li.appendChild(link);
+            }
+
+            if (chat.message) {
+                const messageSpan = document.createElement('span');
+                messageSpan.textContent = chat.message;
+                li.appendChild(messageSpan);
+            }
+
             ul.appendChild(li);
         }
     });
@@ -94,19 +128,39 @@ function handleFormSubmit(event) {
     }
     const messageInput = document.querySelector('.chat-input');
     const message = messageInput.value;
-    if (!message.trim()) {
-        return; // Don't send empty messages
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (!message.trim() && !file) {
+        return; // Don't send empty messages or without a file
     }
-    const obj = {
-        message: message,
-        groupId: currentGroupId
+
+    const formData = new FormData();
+    formData.append('message', message);
+    formData.append('groupId', currentGroupId);
+    if (file) {
+        formData.append('file', file);
     }
+
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/chat/msg', obj, {
-        headers: { 'Authorization': token }
+    axios.post('http://localhost:3000/chat/msg', formData, {
+        headers: { 
+            'Authorization': token,
+            'Content-Type': 'multipart/form-data'
+        }
     }).then((res) => {
         console.log(res);
+        // Update UI immediately after sending the message
+        const newMessage = {
+            id: res.data.chatId,
+            message: message,
+            username: res.data.username,
+            fileUrl: res.data.fileUrl,
+            createdAt: res.data.createdAt
+        };
+        appendNewChatsToUI([newMessage]);
         messageInput.value = ''; // Clear the input field
+        fileInput.value = ''; // Clear the file input
     }).catch((err) => {
         console.error(err);
     });
@@ -311,5 +365,10 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    socket.on('new message', handleNewMessage);
+    socket.on('new message', (message) => {
+        console.log('New message received:', message);
+        if (message.groupId === currentGroupId) {
+            handleNewMessage(message);
+        }
+    });
 });

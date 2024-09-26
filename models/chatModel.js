@@ -12,6 +12,10 @@ const Chat = sequelize.define('chat', {
     type: Sequelize.STRING,
     allowNull: false
   },
+  fileUrl: {
+    type: Sequelize.STRING,
+    allowNull: true
+  }
 });
 
 module.exports = Chat;

@@ -14,7 +14,7 @@
     "nodemon": "^3.1.4"
   },
   "dependencies": {
-    "aws-sdk": "^2.1687.0",
+    "aws-sdk": "^2.1691.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
@@ -26,6 +26,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "mysql2": "^3.10.2",
     "pug": "^3.0.3",
     "sequelize": "^6.37.3",

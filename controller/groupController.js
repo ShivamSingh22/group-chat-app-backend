@@ -202,34 +202,6 @@ exports.getGroupMembers = async (req, res) => {
     }
 };
 
-exports.getNonGroupMembers = async (req, res) => {
-    try {
-        const { groupId } = req.params;
-        // Check if the user is a member of the group
-        const isMember = await GroupMember.findOne({
-            where: { groupId, userId: req.user.id }
-        });
-        if (!isMember) {
-            return res.status(403).json({ message: "You are not a member of this group" });
-        }
-
-        // Get all users who are not members of this group
-        const nonMembers = await User.findAll({
-            where: {
-                id: {
-                    [Op.notIn]: sequelize.literal(`(SELECT userId FROM groupMembers WHERE groupId = ${groupId})`)
-                }
-            },
-            attributes: ['id', 'username', 'email']
-        });
-
-        res.status(200).json({ nonMembers });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-};
-
 exports.addUserToGroup = async (req, res) => {
     try {
         const { groupId, userId } = req.body;

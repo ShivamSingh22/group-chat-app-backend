@@ -92,5 +92,15 @@ sequelize
     console.log(err);
   });
 
+// After creating a new chat message
+// io.to(groupId).emit('new message', {
+//     id: chat.id,
+//     message: chat.message,
+//     userId: chat.userId,
+//     username: req.user.username,
+//     createdAt: chat.createdAt,
+//     fileUrl: chat.fileUrl
+// });
+
 // Export both app and io
 module.exports = { app, io };
