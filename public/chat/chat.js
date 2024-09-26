@@ -1,8 +1,31 @@
+
+const socket = io('http://localhost:3000', {
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+});
+
+socket.on('connect', () => {
+    console.log('Connected to server');
+});
+
+socket.on('connect_error', (error) => {
+    console.error('Connection error:', error);
+});
+
+socket.on('disconnect', (reason) => {
+    console.log('Disconnected:', reason);
+});
+
 let lastMessageIds = {};
 let currentGroupId = null;
 
 function switchGroup(groupId) {
+    if (currentGroupId) {
+        socket.emit('leave group', currentGroupId);
+    }
     currentGroupId = groupId;
+    socket.emit('join group', groupId);
     
     document.querySelectorAll('#groupList li').forEach(li => {
         li.classList.remove('selected');
@@ -84,45 +107,20 @@ function handleFormSubmit(event) {
     }).then((res) => {
         console.log(res);
         messageInput.value = ''; // Clear the input field
-        const newChat = {
-            id: res.data.chatId,
-            message: message,
-            username: res.data.username,
-            createdAt: res.data.createdAt
-        };
-        appendNewChatsToUI([newChat]);
-        lastMessageIds[currentGroupId] = Math.max(lastMessageIds[currentGroupId], newChat.id);
-        // Store the updated last message ID for this group in localStorage
-        localStorage.setItem(`lastMessageId_${currentGroupId}`, lastMessageIds[currentGroupId]);
-        // Update stored messages in localStorage
-        const storedMessages = JSON.parse(localStorage.getItem(`messages_${currentGroupId}`)) || [];
-        storedMessages.push(newChat);
-        localStorage.setItem(`messages_${currentGroupId}`, JSON.stringify(storedMessages));
     }).catch((err) => {
         console.error(err);
     });
 }
 
-function handleGetChat() {
-    if (!currentGroupId) return;
-    const token = localStorage.getItem('token');
-    axios.get(`http://localhost:3000/chat/msg?groupId=${currentGroupId}&lastId=${lastMessageIds[currentGroupId]}`, {
-        headers: { 'Authorization': token }
-    }).then((res) => {
-        const newChats = res.data.chats;
-        if (newChats.length > 0) {
-            appendNewChatsToUI(newChats);
-            lastMessageIds[currentGroupId] = Math.max(...newChats.map(chat => chat.id), lastMessageIds[currentGroupId]);
-            // Store the updated last message ID for this group in localStorage
-            localStorage.setItem(`lastMessageId_${currentGroupId}`, lastMessageIds[currentGroupId]);
-            // Update stored messages in localStorage
-            const storedMessages = JSON.parse(localStorage.getItem(`messages_${currentGroupId}`)) || [];
-            const updatedMessages = [...storedMessages, ...newChats];
-            localStorage.setItem(`messages_${currentGroupId}`, JSON.stringify(updatedMessages));
-        }
-    }).catch((err) => {
-        console.error(err);
-    });
+function handleNewMessage(message) {
+    appendNewChatsToUI([message]);
+    lastMessageIds[currentGroupId] = Math.max(lastMessageIds[currentGroupId], message.id);
+    // Store the updated last message ID for this group in localStorage
+    localStorage.setItem(`lastMessageId_${currentGroupId}`, lastMessageIds[currentGroupId]);
+    // Update stored messages in localStorage
+    const storedMessages = JSON.parse(localStorage.getItem(`messages_${currentGroupId}`)) || [];
+    storedMessages.push(message);
+    localStorage.setItem(`messages_${currentGroupId}`, JSON.stringify(storedMessages));
 }
 
 function fetchGroupMembers(groupId) {
@@ -229,9 +227,12 @@ function createGroup() {
         const token = localStorage.getItem('token');
         axios.post('http://localhost:3000/group/create', { name: groupName }, {
             headers: { 'Authorization': token }
-        }).then(() => {
+        }).then((res) => {
+            console.log('Group created:', res.data);
             getUserGroups();
-        }).catch(console.error);
+        }).catch((err) => {
+            console.error('Error creating group:', err);
+        });
     }
 }
 
@@ -274,6 +275,7 @@ function getUserGroups() {
     axios.get('http://localhost:3000/group/user-groups', {
         headers: { 'Authorization': token }
     }).then((res) => {
+        console.log('Received groups:', res.data);
         displayGroups(res.data.groups);
     }).catch((err) => {
         console.error('Error fetching user groups:', err);
@@ -308,6 +310,6 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchResults').innerHTML = '';
         }
     });
-});
 
-setInterval(handleGetChat, 30000); // Poll for new messages every 30 seconds
+    socket.on('new message', handleNewMessage);
+});

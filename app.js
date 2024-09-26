@@ -3,8 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
-
+const http = require('http');
+const socketIo = require('socket.io');
 
 require("dotenv").config();
 
@@ -20,6 +20,17 @@ const GroupMember = require("./models/groupMemberModel");
 const GroupAdmin = require("./models/groupAdminModel");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: ["http://127.0.0.1:3000", "http://localhost:3000", "null"],
+    methods: ["GET", "POST"]
+  }
+});
+
+// Set io instance on app
+app.set('io', io);
+
 app.use(
   cors({
     origin: ["http://127.0.0.1:3000", "http://localhost:3000", "null"],
@@ -51,11 +62,35 @@ Group.belongsToMany(User, { through: GroupMember });
 Group.belongsToMany(User, { through: GroupAdmin, as: 'Admins' });
 User.belongsToMany(Group, { through: GroupAdmin, as: 'AdminOf' });
 
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('join group', (groupId) => {
+    socket.join(groupId);
+    console.log(`User joined group ${groupId}`);
+  });
+
+  socket.on('leave group', (groupId) => {
+    socket.leave(groupId);
+    console.log(`User left group ${groupId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
 sequelize
   .sync() 
   .then(result => {
-    app.listen(3000);
+    server.listen(3000, () => {
+      console.log('Server is running on port 3000');
+    });
   })
   .catch(err => {
     console.log(err);
   });
+
+// Export both app and io
+module.exports = { app, io };

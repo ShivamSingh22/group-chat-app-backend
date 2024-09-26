@@ -17,6 +17,22 @@ exports.postChat = async (req, res) => {
             userId: req.user.id,
             groupId
         });
+
+        const newMessage = {
+            id: chat.id,
+            message: chat.message,
+            userId: chat.userId,
+            username: req.user.username,
+            createdAt: chat.createdAt
+        };
+        const io = req.app.get('io');
+        if (io) {
+            // Emit the new message to all members of the group
+            io.to(groupId).emit('new message', newMessage);
+        } else {
+            console.warn('Socket.IO instance not available');
+        }
+
         res.status(200).json({ 
             message: "Message sent", 
             chatId: chat.id,

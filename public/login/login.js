@@ -12,13 +12,14 @@ function handleFormSubmit(event){
 
     axios.post('http://localhost:3000/user/login',obj)
     .then((res)=>{
+        console.log('Login successful:', res.data);
         localStorage.setItem('token', res.data.token);
         window.location.href = "../chat/chat.html";
         messageLabel.innerHTML = res.data.message;
         event.target.reset();
     })
     .catch(err=>{
-        messageLabel.innerHTML = err.response.data.message;
-        console.log(err);
+        console.error('Login error:', err);
+        messageLabel.innerHTML = err.response ? err.response.data.message : 'An error occurred';
     })
 }
